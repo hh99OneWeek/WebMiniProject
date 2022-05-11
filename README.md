@@ -63,7 +63,10 @@
 		- comment: [댓글]
 		- upload_date: [업로드 시간]
 		- likes: [좋아요 개수]
-		
+	
+	- likes
+		- prod_id: [상품 ID]
+		- user_id: [사용자 ID]
 		
 		 
 > 5/11

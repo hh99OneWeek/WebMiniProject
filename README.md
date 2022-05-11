@@ -54,7 +54,6 @@
 		- img: [이미지 파일명]
 	
 	- product
-		- prod_id: [상품 ID]
 		- user_id: [사용자 ID]
 		- name: [상품명]
 		- img_url: [이미지 URL]

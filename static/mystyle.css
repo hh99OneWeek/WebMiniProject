@@ -1,0 +1,27 @@
+body {
+    background-color: black;
+    min-height: 100vh;
+}
+
+.section {
+    padding: 1rem 1.5rem;
+    max-width: 750px;
+    margin: auto;
+    color: black;
+}
+
+.title {
+    font-weight: 800;
+    font-size: 5rem;
+    font-family: 'East Sea Dokdo', cursive;
+
+}
+
+.subtitle {
+    font-size: 2rem;
+    font-family: 'Black Han Sans', sans-serif;
+}
+
+.is-sparta {
+    color: black !important;
+}

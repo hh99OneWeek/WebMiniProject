@@ -98,7 +98,7 @@ def get_posts():
         for product in products:
             product["_id"] = str(product["_id"])
             product["likes"] = db.likes.count_documents({"prod_id": product["_id"]})
-            product["like_by_me"] = bool(
+            product["likes_by_me"] = bool(
                 db.likes.find_one({"prod_id": product["_id"], "user_id": payload['id']}))
         return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다.", "products": products})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
@@ -114,6 +114,28 @@ def user(username):
 
         user_info = db.users.find_one({"user_id": username}, {"_id": False})
         return render_template('mywishlist.html', user_info=user_info, status=status)
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
+@app.route('/update_like', methods=['POST'])
+def update_like():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.users.find_one({"user_id": payload["id"]})
+        prod_id_receive = request.form["prod_id_give"]
+        action_receive = request.form["action_give"]
+        doc = {
+            "prod_id": prod_id_receive,
+            "user_id": user_info["user_id"],
+        }
+        if action_receive == "like":
+            db.likes.insert_one(doc)
+        else:
+            db.likes.delete_one(doc)
+
+        count = db.likes.count_documents({"prod_id": prod_id_receive})
+        return jsonify({"result": "success", 'msg': 'updated', "count": count})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 

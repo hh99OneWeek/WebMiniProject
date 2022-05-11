@@ -60,12 +60,47 @@
                 console.log("post end")
             }
 
+            function toggle_like(prod_id) {
+                console.log(prod_id)
+                let $a_like = $(`#${prod_id} a[aria-label='heart']`)
+                let $i_like = $a_like.find("i")
+                if ($i_like.hasClass("fa-heart")) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/update_like",
+                        data: {
+                            prod_id_give: prod_id,
+                            action_give: "unlike"
+                        },
+                        success: function (response) {
+                            console.log("unlike")
+                            $i_like.addClass("fa-heart-o").removeClass("fa-heart")
+                            $a_like.find("span.like-num").text(num2str(response["count"]))
+                        }
+                    })
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "/update_like",
+                        data: {
+                            prod_id_give: prod_id,
+                            action_give: "like"
+                        },
+                        success: function (response) {
+                            console.log("like")
+                            $i_like.addClass("fa-heart").removeClass("fa-heart-o")
+                            $a_like.find("span.like-num").text(num2str(response["count"]))
+                        }
+                    })
+
+                }
+            }
+
             function get_posts(username) {
                 if (username==undefined) {
                     username=""
                 }
                 $("#post-box").empty()
-                console.log("get_post")
                 $.ajax({
                     type: "GET",
                     url: `/get_posts?username_give=${username}`,
@@ -75,6 +110,7 @@
                             let products = response["products"]
                             console.log(products)
                             for (let i = 0; i < products.length; i++) {
+
                                 let product = products[i]
                                 let time_post = new Date(product["upload_date"])
                                 let time_before = time2str(time_post)
@@ -144,7 +180,8 @@
                     return ""
                 }
                 return count
-            }
+        }
+
         </script>
 </head>
 <body>

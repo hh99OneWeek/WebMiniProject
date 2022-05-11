@@ -1,6 +1,7 @@
 body {
     background-color: black;
     min-height: 100vh;
+    padding-top: 3.25rem;
 }
 
 .section {

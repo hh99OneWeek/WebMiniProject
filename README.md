@@ -47,13 +47,13 @@
 	- 상품 상세 페이지(댓글) ->  보류
 
 - 데이터 베이스 개념스키마 설계
-	- user
+	- users
 		- user_id: [사용자 ID]
 		- pwd: [사용자 비밀번호]
 		- nick: [사용자 별명]
 		- img: [이미지 파일명]
 	
-	- product
+	- products
 		- user_id: [사용자 ID]
 		- name: [상품명]
 		- img_url: [이미지 URL]

@@ -32,12 +32,21 @@
         <!-- JS -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+        <script>
+            function logout() {
+                $.removeCookie('mytoken',{path: '/'});
+                window.location.href = '/login'
+                alert("로그아웃 되었습니다!")
+            }
+        </script>
 </head>
 <body>
     <section class="hero is-white">
-        <div class="hero-body has-text-centered" style="padding-bottom:1rem;margin:auto;">
+        <div class="hero-body has-text-centered" onclick="window.location.href = '/'" style="padding-bottom:1rem;margin:auto;">
             <h1 class="title is-sparta">사고 싶은게 참 많다</h1>
             <h3 class="subtitle is-sparta">현명한 소비 습관</h3>
+            <button class="button is-rounded" onclick="logout()">Log out</button>
         </div>
     </section>
     <section class="section">

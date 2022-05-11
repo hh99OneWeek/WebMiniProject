@@ -48,13 +48,14 @@
 
 - 데이터 베이스 개념스키마 설계
 	- user
-		- user_id: [사용자 이름]
+		- user_id: [사용자 ID]
 		- pwd: [사용자 비밀번호]
 		- nick: [사용자 별명]
 		- img: [이미지 파일명]
 	
 	- product
 		- prod_id: [상품 ID]
+		- user_id: [사용자 ID]
 		- name: [상품명]
 		- img_url: [이미지 URL]
 		- purchashed: [상품 구매완료 여부]
@@ -63,6 +64,7 @@
 		- comment: [댓글]
 		- upload_date: [업로드 시간]
 		- likes: [좋아요 개수]
+		
 		
 		 
 	

@@ -52,6 +52,8 @@
 		- pwd: [사용자 비밀번호]
 		- nick: [사용자 별명]
 		- img: [이미지 파일명]
+		- img_real: [변경된 파일명]
+		- description: [자기 소개]
 	
 	- products
 		- user_id: [사용자 ID]

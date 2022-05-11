@@ -57,6 +57,7 @@
 		- user_id: [사용자 ID]
 		- name: [상품명]
 		- img_url: [이미지 URL]
+		- price: [상품가격]
 		- purchashed: [상품 구매완료 여부]
 		- deleted: [상품 삭제 여부]
 		- public: [상품 공개 여부]

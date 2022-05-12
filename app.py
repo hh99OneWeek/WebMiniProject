@@ -151,7 +151,7 @@ def get_public_posts():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        products = list(db.products.find({"public": True}).sort("date", -1).limit(20))
+        products = list(db.products.find({"public": True}).sort("upload_date", -1).limit(20))
 
         for product in products:
             product["_id"] = str(product["_id"])

@@ -148,15 +148,8 @@
                                 let class_heart = product['likes_by_me'] ? "fa-heart": "fa-heart-o"
                                 let count_heart = product['likes']
                                 let html_temp = `<div class="box" id="${product["_id"]}">
-                                        <article class="media">
-                                            <div class="media-left">
-                                                <a class="image is-64x64" href="/user/${product['user_id']}">
-                                                    <img class="is-rounded" src=${product['img_url']}
-                                                         alt="Image">
-                                                </a>
-                                            </div>
-                                            <div class="media-content">
-                                                <div class="content">
+                                            <div>
+                                                <div>
                                                     <p>
                                                         <strong>${product['name']}</strong> <small>@${product['user_id']}</small> <small>${time_before}</small>
                                                         <br>
@@ -175,8 +168,19 @@
 
                                                 </nav>
                                             </div>
+
+                                        <article class="media">
+                                            <div class="media">
+                                                <a href="/user/${product['user_id']}">
+                                                    <img src=${product['img_url']}
+                                                         alt="Image">
+                                                </a>
+                                            </div>
+
                                         </article>
-                                    </div>`
+                                    </div>
+
+                                    `
                                 $("#post-box").append(html_temp)
                             }
                         }

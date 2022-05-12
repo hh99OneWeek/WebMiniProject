@@ -84,7 +84,7 @@ def get_posts():
         if username_receive == "":
             products = list(db.products.find({}).sort("date", -1).limit(20))
         else:
-            products = list(db.products.find({"username": username_receive}).sort("date", -1).limit(20))
+            products = list(db.products.find({"user_id": username_receive}).sort("date", -1).limit(20))
 
         for product in products:
             product["_id"] = str(product["_id"])
@@ -94,6 +94,7 @@ def get_posts():
 
         products.sort(key= lambda product: product["price"])
         print(products)
+        print("user_id:"+username_receive)
 
         return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다.", "products": products})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):

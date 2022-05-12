@@ -35,7 +35,7 @@
 
         <script>
             $(document).ready(function () {
-                get_posts("{{ user_info.username }}")
+                get_posts("{{ user_info.user_id }}")
             })
 
             function post() {
@@ -140,7 +140,6 @@
                             let products = response["products"]
                             console.log(products)
                             for (let i = 0; i < products.length; i++) {
-
                                 let product = products[i]
                                 let time_post = new Date(product["upload_date"])
                                 let time_before = time2str(time_post)
@@ -190,15 +189,18 @@
             <h3 class="subtitle is-sparta">현명한 소비 습관</h3>
         </div>
 
+
         {% if status %}
             <section id="section-post" class="section">
                 <article class="media">
+                    {% endif %}
                     <figure class="media-left" style="align-self: center">
                           <a class="image is-96x96" href="/profile/{{ user_info.user_id}}">
                               <img class="is-rounded" src="{{ url_for('static', filename=user_info.img_real) }}">
                           </a>
 
                     </figure>
+                    {% if status %}
                     <div class="media-content">
                         <div class="field">
                             <p class="control">

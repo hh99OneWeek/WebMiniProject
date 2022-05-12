@@ -59,6 +59,20 @@
                 console.log("post end")
             }
 
+            function delete_post(prod_id){
+                $.ajax({
+                    type: "POST",
+                    url: "del_post",
+                    data: {
+                        prod_id_give: prod_id
+                    },
+                    success: function (responce){
+                        alert(responce["result"])
+                        window.location.reload()
+                    }
+                })
+            }
+
             function toggle_like(prod_id) {
                 console.log(prod_id)
                 let $a_like = $(`#${prod_id} a[aria-label='heart']`)
@@ -167,6 +181,9 @@
                                                             <span class="icon is-small"><i class="fa ${class_heart}"
                                                                                            aria-hidden="true"></i></span>&nbsp;<span class="like-num">${num2str(count_heart)}</span>
                                                         </a>
+                                                        {% if status %}
+                                                        <button onclick="delete_post('${product["_id"]}')">삭제</button>
+                                                        {% endif %}
                                                     </div>
 
                                                 </nav>

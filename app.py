@@ -6,6 +6,7 @@ import requests
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
+from bson.objectid import ObjectId
 import re
 
 
@@ -84,7 +85,8 @@ def get_posts():
         if username_receive == "":
             products = list(db.products.find({}).sort("date", -1).limit(20))
         else:
-            products = list(db.products.find({"user_id": username_receive}).sort("date", -1).limit(20))
+            products = list(db.products.find({"user_id": username_receive, "deleted": False}).sort("date", -1).limit(20))
+
 
         for product in products:
             product["_id"] = str(product["_id"])
@@ -99,6 +101,13 @@ def get_posts():
         return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다.", "products": products})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
+
+@app.route('/del_post', methods=['POST'])
+def delete_post():
+    prod_id_receive = request.form.get("prod_id_give")
+    db.products.update_one({'_id': ObjectId(prod_id_receive)}, {'$set': {'deleted': True}})
+    # db.users.update_one({'user_id': payload['id']}, {'$set': new_doc})
+    return jsonify({"result": "success"})
 
 @app.route('/user/<username>')
 def user(username):

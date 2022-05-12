@@ -54,6 +54,15 @@
 		- img: [이미지 파일명]
 		- img_real: [변경된 파일명]
 		- description: [자기 소개]
+		- address: [주소]
+		- age: [나이]
+		- dream: [장래희망]
+		- email: [이메일]
+		- hobby: [취미]
+		- job: [직업]
+		- insta: [인스타]
+		- phone_number: [연락처]
+	
 	
 	- products
 		- user_id: [사용자 ID]

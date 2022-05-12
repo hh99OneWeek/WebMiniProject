@@ -58,12 +58,14 @@ def posting():
 
         name, img_url, price = get_wishlist(request.form["product_give"])
         date_receive = request.form["date_give"]
+        comment_receive = request.form["comment_give"]
         is_public_receive = request.form["is_public"]
 
         doc = {
             "user_id": user_info["user_id"],
             "name": name,
             "img_url": img_url,
+            "comment": comment_receive,
             "price": price,
             "upload_date": date_receive,
             "purchashed": False,
@@ -102,11 +104,10 @@ def get_posts():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
-@app.route('/del_post', methods=['POST'])
+@app.route('/user/del_post', methods=['POST'])
 def delete_post():
-    prod_id_receive = request.form.get("prod_id_give")
+    prod_id_receive = request.form["prod_id_give"]
     db.products.update_one({'_id': ObjectId(prod_id_receive)}, {'$set': {'deleted': True}})
-    # db.users.update_one({'user_id': payload['id']}, {'$set': new_doc})
     return jsonify({"result": "success"})
 
 @app.route('/user/<username>')
@@ -239,6 +240,8 @@ def profile(username):
 
         user_info = db.users.find_one({"user_id": username}, {"_id": False})
 
+        if user_info == None:
+            return redirect(url_for("home"))
 
         return render_template('profile.html', user_info=user_info, status=status)
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
@@ -258,9 +261,12 @@ def save_img():
         dream_receive = request.form["dream_give"]
         hobby_receive = request.form["hobby_give"]
         email_receive = request.form["email_give"]
-
+        job_receive = request.form["job_give"]
+        insta_receive = request.form["insta_give"]
 
         new_doc = {
+            "insta": insta_receive,
+            "job": job_receive,
             "nick": name_receive,
             "description": about_receive,
             "address": address_receive,
@@ -268,18 +274,19 @@ def save_img():
             "age": age_receive,
             "dream": dream_receive,
             "hobby": hobby_receive,
-            "email": email_receive,
+            "email": email_receive
         }
+
         if 'file_give' in request.files:
             file = request.files["file_give"]
             filename = secure_filename(file.filename)
             extension = filename.split(".")[-1]
-            print("+++++++")
-            img_realname = file.filename.split(".")[0] +'.' +file.filename.split(".")[1]
-            print(img_realname)
+
+            img_realname = file.filename.split(".")[0] + '.' + file.filename.split(".")[1]
+
             file_path = f"profile_pics/{username}.{extension}"
             file.save("./static/"+file_path)
-            new_doc["img"] = filename
+            new_doc["img"] = img_realname
             new_doc["img_real"] = file_path
 
         db.users.update_one({'user_id': payload['id']}, {'$set':new_doc})

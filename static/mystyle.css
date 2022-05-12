@@ -1,7 +1,6 @@
 body {
     background-color: black;
     min-height: 100vh;
-    padding-top: 3.25rem;
 }
 
 .section {
@@ -25,4 +24,19 @@ body {
 
 .is-sparta {
     color: black !important;
+}
+
+.hero {
+    display: flex;
+    justify-content: center;
+}
+
+.hero > .hero-body {
+    /*background-image: url('logo.png');*/
+
+    /*background-position: center;*/
+    /*background-size: contain;*/
+    /*background-repeat: no-repeat;*/
+
+    cursor: pointer;
 }

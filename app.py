@@ -144,6 +144,26 @@ def update_like():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
+# index.html
+@app.route("/get_public_posts", methods=['GET'])
+def get_public_posts():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        products = list(db.products.find({"public": True}).sort("date", -1).limit(20))
+
+        for product in products:
+            product["_id"] = str(product["_id"])
+            product["likes"] = db.likes.count_documents({"prod_id": product["_id"]})
+            product["likes_by_me"] = bool(
+                db.likes.find_one({"prod_id": product["_id"], "user_id": payload['id']}))
+
+
+        return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다.", "products": products})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
+
 
 # login.html
 @app.route('/')
@@ -152,8 +172,7 @@ def home():
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         user_info = db.users.find_one({"user_id": payload["id"]})
-        # return render_template('index.html', user_info=user_info)
-        return render_template('mywishlist.html', user_info=user_info, status=True)
+        return render_template('index.html', user_info=user_info)
 
     except jwt.ExpiredSignatureError:
         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))

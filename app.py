@@ -41,18 +41,9 @@ def get_wishlist(query):
     response = r.json()
     data = response["items"][0]
 
-    # data = response["items"]
-    # aver = 0
-    # for d in data:
-    #     print(d['title'])
-    #     print(d["lprice"])
-    #     aver += int(d["lprice"])
-    # print("평균= ", aver // int(display))
-
-
     name = remove_tag(data['title'])
     img_url = data["image"]
-    price = data["lprice"]+" 원"
+    price = int(data["lprice"])
 
     return name, img_url, price
 
@@ -100,6 +91,10 @@ def get_posts():
             product["likes"] = db.likes.count_documents({"prod_id": product["_id"]})
             product["likes_by_me"] = bool(
                 db.likes.find_one({"prod_id": product["_id"], "user_id": payload['id']}))
+
+        products.sort(key= lambda product: product["price"])
+        print(products)
+
         return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다.", "products": products})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
@@ -139,34 +134,6 @@ def update_like():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
-######### 임시 #########
-# @app.route('/', methods=['GET'])
-# def get():
-#     return render_template("mywishlist.html")
-
-# @app.route('/sign_in', methods=['POST'])
-# def sign_in():
-#
-#     payload = {
-#         'id': "abc",
-#         'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
-#     }
-#     token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-#
-#     return jsonify({'result': 'success', 'token': token})
-#
-# @app.route('/')
-# def home():
-#     token_receive = request.cookies.get('mytoken')
-#     try:
-#         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-#         user_info = db.users.find_one({"username": payload["id"]})
-#         return render_template('index.html', user_info=user_info)
-#     except jwt.ExpiredSignatureError:
-#         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
-#     except jwt.exceptions.DecodeError:
-#         return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
-#######################
 
 # login.html
 @app.route('/')
@@ -183,19 +150,10 @@ def home():
     except jwt.exceptions.DecodeError:
         return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
 
-
 @app.route('/login')
 def login():
-    return render_template('login.html')
-
-@app.route('/mywishlist')
-def mywishlist():
-    return render_template('mywishlist.html')
-
-@app.route('/profile')
-def profile():
-    return render_template('profile.html')
-
+    msg = request.args.get("msg")
+    return render_template('login.html', msg=msg)
 
 @app.route('/sign_in', methods=['POST'])
 def sign_in():
@@ -239,6 +197,66 @@ def check_dup():
     username_receive = request.form['username_give']
     exists = bool(db.users.find_one({"user_id": username_receive}))
     return jsonify({'result': 'success', 'exists': exists})
+
+
+# profile.html
+@app.route('/profile/<username>')
+def profile(username):
+    # 각 사용자의 프로필과 글을 모아볼 수 있는 공간
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        status = (username == payload["id"])  # 내 프로필이면 True, 다른 사람 프로필 페이지면 False
+
+        user_info = db.users.find_one({"user_id": username}, {"_id": False})
+
+
+        return render_template('profile.html', user_info=user_info, status=status)
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
+@app.route('/update_profile', methods=['POST'])
+def save_img():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        username = payload["id"]
+        name_receive = request.form["name_give"]
+        about_receive = request.form["about_give"]
+        address_receive = request.form["address_give"]
+        phone_number_receive = request.form["phone_number_give"]
+        age_receive = request.form["age_give"]
+        dream_receive = request.form["dream_give"]
+        hobby_receive = request.form["hobby_give"]
+        email_receive = request.form["email_give"]
+
+
+        new_doc = {
+            "nick": name_receive,
+            "description": about_receive,
+            "address": address_receive,
+            "phone_number": phone_number_receive,
+            "age": age_receive,
+            "dream": dream_receive,
+            "hobby": hobby_receive,
+            "email": email_receive,
+        }
+        if 'file_give' in request.files:
+            file = request.files["file_give"]
+            filename = secure_filename(file.filename)
+            extension = filename.split(".")[-1]
+            print("+++++++")
+            img_realname = file.filename.split(".")[0] +'.' +file.filename.split(".")[1]
+            print(img_realname)
+            file_path = f"profile_pics/{username}.{extension}"
+            file.save("./static/"+file_path)
+            new_doc["img"] = filename
+            new_doc["img_real"] = file_path
+
+        db.users.update_one({'user_id': payload['id']}, {'$set':new_doc})
+        return jsonify({"result": "success", 'msg': '프로필을 업데이트했습니다.'})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
 
 
 if __name__ == '__main__':

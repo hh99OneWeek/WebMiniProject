@@ -8,16 +8,16 @@
 # from datetime import datetime, timedelta
 #
 # app = Flask(__name__)
-# app.config["TEMPLATES_AUTO_RELOAD"] = True
-# app.config['UPLOAD_FOLDER'] = "./static/profile_pics"
-
+# # app.config["TEMPLATES_AUTO_RELOAD"] = True
+# # app.config['UPLOAD_FOLDER'] = "./static/profile_pics"
+#
 # SECRET_KEY = 'SPARTA'
 #
 # client = MongoClient('mongodb+srv://kokoa223:Skills12##@cluster0.imdsh.mongodb.net/Cluster0?retryWrites=true&w=majority')
 # db = client.dbsparta_plus_week4
-
-# 서버 기능 구현
-
+#
+# # 서버 기능 구현
+#
 # @app.route('/')
 # def home():
 #     token_receive = request.cookies.get('mytoken')
@@ -29,7 +29,7 @@
 #         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
 #     except jwt.exceptions.DecodeError:
 #         return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
-
+#
 # @app.route('/login')
 # def login():
 #     msg = request.args.get("msg")
@@ -58,7 +58,7 @@
 #     # 찾지 못하면
 #     else:
 #         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
-
+#
 # @app.route('/sign_up/save', methods=['POST'])
 # def sign_up():
 #     username_receive = request.form['username_give']
@@ -74,7 +74,7 @@
 #     }
 #     db.users.insert_one(doc)
 #     return jsonify({'result': 'success'})
-
+#
 # @app.route('/sign_up/check_dup', methods=['POST'])
 # def check_dup():
 #     username_receive = request.form['username_give']
@@ -91,11 +91,13 @@ def profile(username):
         status = (username == payload["id"])  # 내 프로필이면 True, 다른 사람 프로필 페이지면 False
 
         user_info = db.users.find_one({"user_id": username}, {"_id": False})
-
-
+        if user_info == None:
+            return redirect(url_for("home"))
         return render_template('profile.html', user_info=user_info, status=status)
+
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
+
 
 @app.route('/update_profile', methods=['POST'])
 def save_img():
@@ -111,9 +113,12 @@ def save_img():
         dream_receive = request.form["dream_give"]
         hobby_receive = request.form["hobby_give"]
         email_receive = request.form["email_give"]
-
+        job_receive = request.form["job_give"]
+        insta_receive = request.form["insta_give"]
 
         new_doc = {
+            "insta": insta_receive,
+            "job": job_receive,
             "nick": name_receive,
             "description": about_receive,
             "address": address_receive,
@@ -121,25 +126,26 @@ def save_img():
             "age": age_receive,
             "dream": dream_receive,
             "hobby": hobby_receive,
-            "email": email_receive,
+            "email": email_receive
         }
+
         if 'file_give' in request.files:
             file = request.files["file_give"]
             filename = secure_filename(file.filename)
             extension = filename.split(".")[-1]
-            print("+++++++")
-            img_realname = file.filename.split(".")[0] +'.' +file.filename.split(".")[1]
-            print(img_realname)
+
+            img_realname = file.filename.split(".")[0] + '.' + file.filename.split(".")[1]
+
             file_path = f"profile_pics/{username}.{extension}"
             file.save("./static/"+file_path)
-            new_doc["img"] = filename
+            new_doc["img"] = img_realname
             new_doc["img_real"] = file_path
 
         db.users.update_one({'user_id': payload['id']}, {'$set':new_doc})
         return jsonify({"result": "success", 'msg': '프로필을 업데이트했습니다.'})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
-
+#
 # @app.route('/mywishlist/<username>')
 # def mywishilist(username):
 #     token_receive = request.cookies.get('mytoken')
@@ -152,7 +158,7 @@ def save_img():
 #         return render_template('mywishlist.html', user_info=user_info, status=status)
 #     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
 #         return render_template('mywishlist.html', user_info=user_info)
-
+#
 #
 # if __name__ == '__main__':
 #     app.run('0.0.0.0', port=5000, debug=True)

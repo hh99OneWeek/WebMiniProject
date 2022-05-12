@@ -11,37 +11,320 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <!-- Webpage Title -->
-        <title>title | TITLE</title>
+    <!-- Webpage Title -->
+    <title>{{ user_info.profile_name }} 프로필</title>
 
-        <!-- Required meta tags -->
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
 
-        <!-- Bulma CSS -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-        <!-- Font Awesome CSS -->
-        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-        <!-- google web font -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=East+Sea+Dokdo&display=swap" rel="stylesheet">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-        <!-- mystyle. CSS -->
-        <link href='{{ url_for("static", filename="mystyle.css") }}' rel="stylesheet">
-        <!-- JS -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <!-- Font Awesome CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- google web font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=East+Sea+Dokdo&display=swap"
+          rel="stylesheet">
+
+    <!-- mystyle. CSS -->
+    <link href='{{ url_for("static", filename="mystyle.css") }}' rel="stylesheet">
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+    <style>
+        .content > div {
+            max-width: 500px;
+            margin: auto;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+    </style>
+    <script>
+
+        function update_profile() {
+            let name = $('#input-name').val()
+            let address = $('#input-address').val()
+            let phone_number = $('#input-phone_number').val()
+            let age = $('#input-age').val()
+            let dream = $('#input-dream').val()
+            let email = $('#input-email').val()
+            let hobby = $('#input-hobby').val()
+            let file = $('#input-pic')[0].files[0]
+            let about = $("#textarea-about").val()
+            let job = $("#input-job").val()
+            let insta = $("#input-insta").val()
+
+
+            let form_data = new FormData()
+            form_data.append("file_give", file)
+            form_data.append("name_give", name)
+            form_data.append("about_give", about)
+            form_data.append("address_give", address)
+            form_data.append("phone_number_give", phone_number)
+            form_data.append("age_give", age)
+            form_data.append("dream_give", dream)
+            form_data.append("email_give", email)
+            form_data.append("hobby_give", hobby)
+            form_data.append("job_give", job)
+            form_data.append("insta_give", insta)
+
+            console.log(name, file, about, form_data)
+
+            $.ajax({
+                type: "POST",
+                url: "/update_profile",
+                data: form_data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        alert(response["msg"])
+                        window.location.reload()
+
+                    }
+                }
+            });
+        }
+
+        function sign_out() {
+            $.removeCookie('mytoken', {path: '/'});
+            alert('로그아웃!')
+            window.location.href = "/login"
+        }
+
+        $(document).ready(function () {
+
+            get_posts($("#hiddenDataId"))
+        });
+
+
+    </script>
 </head>
-<body>
-    <section class="hero is-white">
-        <div class="hero-body has-text-centered" style="padding-bottom:1rem;margin:auto;">
+<body style="background-color: white;">
+<section class="hero is-white">
+        <div class="hero-body has-text-centered" onclick="window.location.href = '/'" style="padding-bottom:1rem;margin:auto;">
             <h1 class="title is-sparta">사고 싶은게 참 많다</h1>
             <h3 class="subtitle is-sparta">현명한 소비 습관</h3>
+            <button class="button is-rounded" onclick="logout()">Log out</button>
         </div>
     </section>
-    <section class="section">
-    <section>
+    <section class="hero is-white">
+        <div class="hero-body" style="padding-bottom:1rem;margin:auto;min-width: 400px">
+            <article class="media">
+
+                <figure class="media-left" style="align-self: center">
+                    <a class="image is-96x96" href="/profile/{{ user_info.user_id }}">
+                        <img class="is-rounded" src="{{ url_for('static', filename=user_info.img_real) }}" alt="Image">
+                    </a>
+                </figure>
+                <div class="media-content">
+                    <div class="content">
+                        <p>
+                            <strong>{{ user_info.nick }}</strong> <small>@{{ user_info.user_id }}</small>
+                            <br>
+                            {{ user_info.description }}
+                        </p>
+                    </div>
+
+                </div>
+            </article>
+            {% if status %}
+                <nav id="btns-me" class="level is-mobile" style="margin-top:2rem">
+                    <a class="button level-item has-text-centered is-sparta" aria-label="edit"
+                       onclick='$("#modal-edit").addClass("is-active")'>
+                        프로필 수정&nbsp;&nbsp;&nbsp;<span class="icon is-small"><i class="fa fa-pencil"
+                                                                               aria-hidden="true"></i></span>
+                    </a>
+
+                    <a class="button level-item has-text-centered is-sparta is-outlined" aria-label="logout"
+                       onclick="sign_out()">
+                        로그아웃&nbsp;&nbsp;&nbsp;<span class="icon is-small"><i class="fa fa-sign-out"
+                                                                             aria-hidden="true"></i></span>
+                    </a>
+                </nav>
+
+                <div class="modal" id="modal-edit">
+                    <div class="modal-background" onclick='$("#modal-edit").removeClass("is-active")'></div>
+                    <div class="modal-content">
+                        <div class="box">
+                            <article class="media">
+                                <div class="media-content">
+                                    <div class="field">
+                                        <label class="label" for="input-pic">프로필 사진</label>
+
+                                        <div class="control is-expanded">
+                                            <div class="file has-name">
+                                                <label class="file-label" style="width:100%">
+                                                    <input id="input-pic" class="file-input" type="file" name="resume">
+                                                    <span class="file-cta"><span class="file-icon"><i
+                                                            class="fa fa-upload"></i></span>
+                                                    <span class="file-label">파일 선택</span>
+                                                </span>
+                                                    <span id="file-name" class="file-name"
+                                                          style="width:100%;max-width:100%">{{ user_info.img }}</span>
+                                                </label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <label class="label" for="input-name">이름</label>
+                                        <p class="control">
+                                            <input id="input-name" class="input"
+                                                   placeholder="홍길동" value="{{ user_info.user_id }}">
+                                        </p>
+                                    </div>
+                                    <div class="field">
+                                        <label class="label" for="input-name">나이</label>
+                                        <p class="control">
+                                            <input id="input-age" class="input"
+                                                   placeholder="26" value="{{ user_info.age }}">
+                                        </p>
+                                    </div>
+                                    <div class="field">
+                                        <label class="label" for="input-name"> 직업</label>
+                                        <p class="control">
+                                            <input id="input-job" class="input"
+                                                   placeholder="" value="{{ user_info.job }}">
+                                        </p>
+                                    </div>
+                                    <div class="field">
+                                        <label class="label" for="input-name">인스타그램</label>
+                                        <p class="control">
+                                            <input id="input-insta" class="input"
+                                                   placeholder="" value="{{ user_info.insta }}">
+                                        </p>
+                                    </div>
+                                    <div class="field">
+                                        <label class="label" for="input-name">이메일</label>
+                                        <p class="control">
+                                            <input id="input-email" class="input"
+                                                   placeholder="" value="{{ user_info.email }}">
+                                        </p>
+                                    </div>
+                                    <div class="field">
+                                        <label class="label" for="input-name">주소</label>
+                                        <p class="control">
+                                            <input id="input-address" class="input"
+                                                   placeholder="" value="{{ user_info.address }}">
+                                        </p>
+                                    </div>
+                                    <div class="field">
+                                        <label class="label" for="input-name">전화번호</label>
+                                        <p class="control">
+                                            <input id="input-phone_number" class="input"
+                                                   placeholder="" value="{{ user_info.phone_number }}">
+                                        </p>
+                                    </div>
+                                    <div class="field">
+                                        <label class="label" for="input-name">목표</label>
+                                        <p class="control">
+                                            <input id="input-dream" class="input"
+                                                   placeholder="" value="{{ user_info.dream }}">
+                                        </p>
+                                    </div>
+                                    <div class="field">
+                                        <label class="label" for="input-name">취미</label>
+                                        <p class="control">
+                                            <input id="input-hobby" class="input"
+                                                   placeholder="" value="{{ user_info.hobby }}">
+                                        </p>
+                                    </div>
+                                    <div class="field">
+                                        <label class="label" for="textarea-about">나는 누구?</label>
+
+                                        <p class="control">
+
+                                            <textarea id="textarea-about" class="textarea"
+                                                      placeholder="자기소개하기">{{ user_info.description }}</textarea>
+                                        </p>
+                                    </div>
+                                    <nav class="level is-mobile">
+                                        <div class="level-left">
+
+                                        </div>
+                                        <div class="level-right">
+                                            <div class="level-item">
+                                                <a class="button is-sparta" onclick="update_profile()">업데이트</a>
+                                            </div>
+                                            <div class="level-item">
+                                                <a class="button is-sparta is-outlined"
+                                                   onclick='$("#modal-edit").removeClass("is-active")'>취소</a>
+                                            </div>
+                                        </div>
+                                    </nav>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                    <button class="modal-close is-large" aria-label="close"
+                            onclick='$("#modal-edit").removeClass("is-active")'></button>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+</section>
+
+    <div>
+
+        <div class="content">
+            <div>
+                <table style="margin-top: 50px">
+                    <thead>
+                    <tr>
+                        <th> 직업:</th>
+                        <td>{{ user_info.job }}</td>
+                    </tr>
+                    <tr>
+                        <th> 나이:</th>
+                        <td>{{ user_info.age }}</td>
+                    </tr>
+                    <tr>
+                        <th> 전화번호:</th>
+                        <td>{{ user_info.phone_number }}</td>
+                    </tr>
+                    <tr>
+                        <th> 주소:</th>
+                        <td>{{ user_info.address }}</td>
+                    </tr>
+                    <tr>
+                        <th> 이메일:</th>
+                        <td>{{ user_info.email }}</td>
+                    </tr>
+                    <tr>
+                        <th> 인스타그램:</th>
+                        <td>{{ user_info.insta }}</td>
+                    </tr>
+                    <tr>
+                        <th> 목표:</th>
+                        <td>{{ user_info.dream}}</td>
+                    </tr>
+                    <tr>
+                        <th> 취미:</th>
+                        <td>{{ user_info.hobby }}</td>
+                    </tr>
+
+
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+    </div>
 
 </body>
 </html>

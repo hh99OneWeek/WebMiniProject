@@ -51,7 +51,9 @@ def sign_in():
          'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+
         user_info = db.users.find_one({"user_id": payload['id']}, {"_id": False})
+
         return jsonify({'result': 'success', 'token': token, 'user_info': user_info})
     # 찾지 못하면
     else:
@@ -81,16 +83,15 @@ def check_dup():
 
 
 @app.route('/profile/<username>')
-def user(username):
+def profile(username):
     # 각 사용자의 프로필과 글을 모아볼 수 있는 공간
     token_receive = request.cookies.get('mytoken')
     try:
-        print(username)
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         status = (username == payload["id"])  # 내 프로필이면 True, 다른 사람 프로필 페이지면 False
 
-        print(status)
         user_info = db.users.find_one({"user_id": username}, {"_id": False})
+
 
         return render_template('profile.html', user_info=user_info, status=status)
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
@@ -104,14 +105,31 @@ def save_img():
         username = payload["id"]
         name_receive = request.form["name_give"]
         about_receive = request.form["about_give"]
+        address_receive = request.form["address_give"]
+        phone_number_receive = request.form["phone_number_give"]
+        age_receive = request.form["age_give"]
+        dream_receive = request.form["dream_give"]
+        hobby_receive = request.form["hobby_give"]
+        email_receive = request.form["email_give"]
+
+
         new_doc = {
             "nick": name_receive,
-            "description": about_receive
+            "description": about_receive,
+            "address": address_receive,
+            "phone_number": phone_number_receive,
+            "age": age_receive,
+            "dream": dream_receive,
+            "hobby": hobby_receive,
+            "email": email_receive,
         }
         if 'file_give' in request.files:
             file = request.files["file_give"]
             filename = secure_filename(file.filename)
             extension = filename.split(".")[-1]
+            print("+++++++")
+            img_realname = file.filename.split(".")[0] +'.' +file.filename.split(".")[1]
+            print(img_realname)
             file_path = f"profile_pics/{username}.{extension}"
             file.save("./static/"+file_path)
             new_doc["img"] = filename
@@ -124,8 +142,6 @@ def save_img():
 
 @app.route('/mywishlist/<username>')
 def mywishilist(username):
-
-    print(username)
     token_receive = request.cookies.get('mytoken')
 
     user_info = db.users.find_one({"user_id": username}, {"_id": False})
@@ -136,10 +152,6 @@ def mywishilist(username):
         return render_template('mywishlist.html', user_info=user_info, status=status)
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return render_template('mywishlist.html', user_info=user_info)
-
-
-
-
 
 
 if __name__ == '__main__':
